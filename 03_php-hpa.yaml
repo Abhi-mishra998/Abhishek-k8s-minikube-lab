@@ -1,0 +1,71 @@
+# Step 1: Create a ConfigMap with an index.php
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: php-index
+data:
+  index.php: |
+    <?php echo "Hello from PHP-Apache on Kubernetes By Abhishek Mishra!"; ?>
+---
+# Step 2: Create the Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-apache
+  labels:
+    app: php-apache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: php-apache
+  template:
+    metadata:
+      labels:
+        app: php-apache
+    spec:
+      containers:
+        - name: php-apache
+          image: php:7.4-apache
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "100m"
+            limits:
+              cpu: "500m"
+          volumeMounts:
+            - name: php-index
+              mountPath: /var/www/html/index.php
+              subPath: index.php
+      volumes:
+        - name: php-index
+          configMap:
+            name: php-index
+---
+# Step 3: Create a ClusterIP service
+apiVersion: v1
+kind: Service
+metadata:
+  name: php-apache
+spec:
+  selector:
+    app: php-apache
+  ports:
+    - port: 80
+      targetPort: 80
+  type: ClusterIP
+---
+# Step 4: Create the Horizontal Pod Autoscaler
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: php-apache-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: php-apache
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 50
