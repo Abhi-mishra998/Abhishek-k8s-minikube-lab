@@ -5,8 +5,6 @@
 ````markdown
 # Kubernetes / Minikube Quick Reference & Demo Commands
 
-This guide provides a professional and clean set of commands to manage Kubernetes resources on Minikube, including nginx deployments, PHP-Apache with HPA, ConfigMaps, load generation, and debugging.
-
 ---
 
 ## Prerequisites
@@ -224,6 +222,4 @@ kubectl delete pod loadgen testpod* --ignore-not-found
 * `wget -S --header="User-Agent: Mozilla/5.0" -O- http://service` avoids Apache 403 errors for simple clients.
 * Always create output directories before redirecting pod data to host files: `mkdir outputs`.
 
----
-##Author:Abhishek-Mishra
-```
+##Author: Abhishek-Mishra
